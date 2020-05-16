@@ -1,7 +1,0 @@
-C:\Users\Helios\source\repos\BadBoy\BadBoy\bin\Release\BadBoy.exe.config
-C:\Users\Helios\source\repos\BadBoy\BadBoy\bin\Release\BadBoy.exe
-C:\Users\Helios\source\repos\BadBoy\BadBoy\bin\Release\BadBoy.pdb
-C:\Users\Helios\source\repos\BadBoy\BadBoy\obj\Release\BadBoy.csproj.CoreCompileInputs.cache
-C:\Users\Helios\source\repos\BadBoy\BadBoy\obj\Release\BadBoy.exe
-C:\Users\Helios\source\repos\BadBoy\BadBoy\obj\Release\BadBoy.pdb
-C:\Users\Helios\source\repos\BadBoy\BadBoy\obj\Release\BadBoy.csprojAssemblyReference.cache

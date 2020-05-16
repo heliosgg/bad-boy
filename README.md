@@ -1,1 +1,3 @@
-This application checks what you type and replaces bad words(just russian now) with '*'
+## BadBoy
+This library checks and filters explicit language that you type.  
+*Only supports Russian language*
