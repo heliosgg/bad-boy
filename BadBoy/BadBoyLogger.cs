@@ -4,11 +4,15 @@ namespace BadBoy
 {
     public static class BadBoyLogger
     {
-        public static Action<string> Info  { get; set; }
-        public static Action<string> Error { get; set; }
+        private static Action<string> _info;
+        private static Action<string> _error;
 
-        internal static void LogInfo(string log) => Info?.Invoke($"[INFO] {log}");
+        public static void RegisterInfoLogger(Action<string> logger) => _info = logger;
 
-        internal static void LogError(string log) => Error?.Invoke($"[ERROR] {log}");
+        public static void RegisterErrorLogger(Action<string> logger) => _error = logger;
+
+        internal static void LogInfo(string log) => _info?.Invoke($"[INFO] {log}");
+
+        internal static void LogError(string log) => _error?.Invoke($"[ERROR] {log}");
     }
 }

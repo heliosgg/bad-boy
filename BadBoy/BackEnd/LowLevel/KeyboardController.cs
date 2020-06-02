@@ -45,30 +45,30 @@ namespace BadBoy.BackEnd.LowLevel
 
         private static readonly bool[] KeyStates = new bool[256];
 
-        private static LowLevelKeyboardProcess process = HookCalback;
-        private static IntPtr                  hookId  = IntPtr.Zero;
+        private static LowLevelKeyboardProcess _process = HookCalback;
+        private static IntPtr                  _hookId  = IntPtr.Zero;
 
         public static event Action<string> OnWordTyped;
 
-        private static StringBuilder currentWord = new StringBuilder();
+        private static StringBuilder _currentWord = new StringBuilder();
 
         public static bool HookKeyboard()
         {
-            if (hookId != IntPtr.Zero)
+            if (_hookId != IntPtr.Zero)
                 return false;
 
-            hookId = SetHook(process);
+            _hookId = SetHook(_process);
 
-            return hookId != IntPtr.Zero;
+            return _hookId != IntPtr.Zero;
         }
 
         public static bool ReleaseKeyboard()
         {
-            if (hookId == IntPtr.Zero)
+            if (_hookId == IntPtr.Zero)
                 return false;
 
-            bool result = UnhookWindowsHookEx(hookId);
-            hookId = IntPtr.Zero;
+            bool result = UnhookWindowsHookEx(_hookId);
+            _hookId = IntPtr.Zero;
 
             return result;
         }
@@ -88,7 +88,7 @@ namespace BadBoy.BackEnd.LowLevel
                 KeyStates[virtualKey] = false;
             }
 
-            return CallNextHookEx(hookId, nCode, wParam, lParam);
+            return CallNextHookEx(_hookId, nCode, wParam, lParam);
         }
 
         private static IntPtr SetHook(LowLevelKeyboardProcess process)
@@ -105,43 +105,66 @@ namespace BadBoy.BackEnd.LowLevel
             {
                 case VirtualKeys.Backspace:
 
-                    if (currentWord.Length == 0)
+                    if (_currentWord.Length == 0)
                         return;
 
                     if (KeyStates[(int) VirtualKeys.Control] ||
                         KeyStates[(int) VirtualKeys.LeftControl] ||
                         KeyStates[(int) VirtualKeys.RightControl])
                     {
-                        currentWord = currentWord.Clear();
+                        _currentWord = _currentWord.Clear();
 
                         return;
                     }
 
-                    currentWord = currentWord.Remove(currentWord.Length - 1, 1);
+                    _currentWord = _currentWord.Remove(_currentWord.Length - 1, 1);
 
                     return;
 
                 case VirtualKeys.Enter:
                 case VirtualKeys.Space:
 
-                    if (currentWord.Length == 0)
+                    if (_currentWord.Length == 0)
                         return;
 
-                    OnWordTyped?.Invoke(currentWord.ToString());
+                    OnWordTyped?.Invoke(_currentWord.ToString());
 
-                    currentWord = currentWord.Clear();
+                    _currentWord = _currentWord.Clear();
 
                     return;
 
                 case VirtualKeys.Alt:
                 case VirtualKeys.LeftAlt:
                 case VirtualKeys.RightAlt: return;
+
+                default:
+                    if (KeyStates[(int) VirtualKeys.Control] ||
+                        KeyStates[(int) VirtualKeys.LeftControl] ||
+                        KeyStates[(int) VirtualKeys.RightControl] ||
+                        KeyStates[(int) VirtualKeys.Alt] ||
+                        KeyStates[(int) VirtualKeys.LeftAlt] ||
+                        KeyStates[(int) VirtualKeys.RightAlt])
+                    {
+                        return;
+                    }
+
+                    char letter = GetKeyboardLetter(virtualKey);
+
+                    if (!char.IsLetter(letter))
+                        return;
+
+                    if (!KeyStates[(int) VirtualKeys.Shift] &&
+                        !KeyStates[(int) VirtualKeys.LeftShift] &&
+                        !KeyStates[(int) VirtualKeys.RightShift] &&
+                        GetKeyState((int) VirtualKeys.CapsLock) == 0)
+                    {
+                        letter = char.ToLower(letter);
+                    }
+
+                    _currentWord.Append(letter);
+                    
+                    break;
             }
-
-            char letter = GetKeyboardLetter(virtualKey);
-
-            if (char.IsLetter(letter))
-                currentWord.Append(letter);
         }
 
         private static char GetKeyboardLetter(int virtualKey)
@@ -152,14 +175,6 @@ namespace BadBoy.BackEnd.LowLevel
 
             if (layoutId == EnglishKeyboardLayoutId)
                 letter = EnglishToRussian(letter);
-
-            if (KeyStates[(int) VirtualKeys.Shift] ||
-                KeyStates[(int) VirtualKeys.LeftShift] ||
-                KeyStates[(int) VirtualKeys.RightShift] ||
-                GetKeyState((int) VirtualKeys.CapsLock) != 0)
-            {
-                return letter;
-            }
 
             return char.ToLower(letter);
         }

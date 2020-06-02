@@ -10,9 +10,9 @@ namespace TestApplication
         private static void Main()
         {
             Console.OutputEncoding = Encoding.Unicode;
-            
-            BadBoyLogger.Info = Console.WriteLine;
-            BadBoyLogger.Error = Console.Error.WriteLine;
+
+            BadBoyLogger.RegisterInfoLogger(Console.WriteLine);
+            BadBoyLogger.RegisterErrorLogger(Console.Error.WriteLine);
 
             var badBoy = new BadBoyCore();
             badBoy.Start();

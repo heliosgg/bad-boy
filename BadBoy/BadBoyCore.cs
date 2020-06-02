@@ -8,18 +8,17 @@ namespace BadBoy
 {
     public class BadBoyCore
     {
-        private Thread applicationThread;
+        private Thread _applicationThread = new Thread(ExecutionThread);
 
         public void Start()
         {
-            applicationThread = new Thread(ExecutionThread);
-            applicationThread.Start();
+            _applicationThread.Start();
         }
 
         public void Stop()
         {
             Application.Exit();
-            applicationThread.Join();
+            _applicationThread.Join();
         }
 
         private static void ExecutionThread()
